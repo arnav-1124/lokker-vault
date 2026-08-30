@@ -10,16 +10,23 @@
  *
  * This is deliberately small. Grow it only when real error categories emerge.
  */
+
+export interface AppErrorOptions {
+  /** Stable machine-readable error code. */
+  code?: string;
+  /** End-user-safe message; defaults to a generic string so internal
+   *  details never leak by accident. */
+  userMessage?: string;
+  /** Original error, preserved for logs. */
+  cause?: unknown;
+}
+
 export class AppError extends Error {
-  /**
-   * @param {string} message   Developer-facing description, safe for logs.
-   * @param {object} [options]
-   * @param {string} [options.code]      Stable machine-readable error code.
-   * @param {string} [options.userMessage] End-user-safe message. Defaults to a
-   *   generic string so internal details never leak by accident.
-   * @param {unknown} [options.cause]    Original error, preserved for logs.
-   */
-  constructor(message, { code = "APP_ERROR", userMessage, cause } = {}) {
+  readonly code: string;
+  readonly userMessage: string;
+
+  constructor(message: string, options: AppErrorOptions = {}) {
+    const { code = "APP_ERROR", userMessage, cause } = options;
     super(message, { cause });
     this.name = new.target.name;
     this.code = code;

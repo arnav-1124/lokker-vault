@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import type { ComponentProps } from "react";
 import { useTheme } from "next-themes";
 import {
   AlertCircle,
@@ -24,15 +25,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Dialog,
   DialogContent,
@@ -65,6 +61,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Section } from "./section";
 
 /*
   DESIGN-SYSTEM PREVIEW — internal verification surface only.
@@ -75,28 +72,22 @@ import {
 
 function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => setMounted(true), []);
+
+  const label = mounted
+    ? `Switch to ${resolvedTheme === "dark" ? "light" : "dark"} theme`
+    : "Toggle theme";
+
   return (
     <Button
       variant="outline"
       size="sm"
       onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
     >
-      Switch to {resolvedTheme === "dark" ? "light" : "dark"} theme
+      {label}
     </Button>
-  );
-}
-
-function Section({ id, title, description, children }) {
-  return (
-    <section id={id} className="scroll-mt-24 space-y-4">
-      <div>
-        <h2 className="text-heading font-semibold">{title}</h2>
-        {description ? (
-          <p className="text-caption text-muted-foreground">{description}</p>
-        ) : null}
-      </div>
-      {children}
-    </section>
   );
 }
 
@@ -107,7 +98,20 @@ const SURFACE_LEVELS = [
   ["bg-surface-overlay", "surface-overlay"],
   ["bg-surface-hover", "surface-hover"],
   ["bg-surface-active", "surface-active"],
-];
+] as const;
+
+type SurfaceSwatchProps = ComponentProps<"div"> & { name: string };
+
+function SurfaceSwatch({ name, className, ...props }: SurfaceSwatchProps) {
+  return (
+    <div
+      className={`${className} rounded-lg border border-border-subtle p-4 shadow-xs`}
+      {...props}
+    >
+      <p className="text-caption text-muted-foreground">{name}</p>
+    </div>
+  );
+}
 
 export default function DesignSystemPage() {
   return (
@@ -171,12 +175,7 @@ export default function DesignSystemPage() {
           >
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
               {SURFACE_LEVELS.map(([token, name]) => (
-                <div
-                  key={name}
-                  className={`${token} rounded-lg border border-border-subtle p-4 shadow-xs`}
-                >
-                  <p className="text-caption text-muted-foreground">{name}</p>
-                </div>
+                <SurfaceSwatch key={name} name={name} className={token} />
               ))}
             </div>
           </Section>

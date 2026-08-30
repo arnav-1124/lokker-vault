@@ -8,4 +8,6 @@ export const appConfig = {
   description:
     "Lokker is a privacy-first, local-first password vault and browser security utility. Your secrets stay on your device.",
   url: "http://localhost:3000",
-};
+} as const;
+
+export type AppConfig = typeof appConfig;
